@@ -4,7 +4,7 @@ using FluentValidation;
 
 namespace TaskManagerAPI.Validators;
 
-public class CreateTaskRequestValidator : AbstractValidator<CreateTaskRequest>, IMapper
+public class CreateTaskRequestValidator : AbstractValidator<CreateTaskRequest>
 {
     public CreateTaskRequestValidator()
     {
