@@ -1,16 +1,28 @@
 using FastEndpoints;
+using FastEndpoints.Swagger;
 using TaskManagerAPI.Services;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddFastEndpoints();
+builder.Services.AddFastEndpoints(options => 
+{
+    options.IncludeAbstractValidators = true; // This is important for validation!
+});
 builder.Services.AddSingleton<ITaskService,TaskService>();
 
+builder.Services.SwaggerDocument(o =>
+{
+    o.DocumentSettings = s =>
+    {
+        s.Title = "TaskManagerAPI";
+        s.Version = "v1";
+    };
+});
+
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -21,9 +33,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-app.UseFastEndpoints();
+app.UseAuthorization();
 
+// Configure FastEndpoints with validation
+app.UseFastEndpoints(c => 
+{
+    c.Errors.UseProblemDetails();
+});
+
+
+app.UseSwaggerGen();
 
 app.Run();
-
